@@ -25,22 +25,18 @@ jobs:
         pip install --upgrade pip
         pip install "cython<3.0.0" buildozer
 
-    - name: Configurar SDK/NDK Android
+    - name: Configurar SDK/NDK Android Oficial
       uses: android-actions/setup-android@v4
 
-    - name: Compilar APK aceitando licenças automaticamente
+    - name: Compilar APK com SDK do Sistema
       run: |
-        # Este comando cria as pastas e aceita as licenças onde o Buildozer vai procurar
-        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-        echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb7437c3550b3118bca0\n24333f1a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        # Aceita todas as licenças do SDK oficial do GitHub antes de começar
+        yes | sdkmanager --licenses || true
         
-        # Executa a compilação enviando "y" (sim) para qualquer pergunta que surgir no terminal
-        yes | buildozer android debug
-      env:
-        ACCEPT_BUILD_TOOLS_LICENSES: 'y'
-
-    - name: Disponibilizar ficheiro APK para Download
-      uses: actions/upload-artifact@v4
-      with:
-        name: EbenesisGamer-APK
-        path: bin/*.apk
+        # Cria as pastas onde o Buildozer espera encontrar o SDK e faz links diretos
+        # para o SDK oficial que já está instalado e funciona perfeitamente!
+        mkdir -p ~/.buildozer/android/platform
+        ln -s $ANDROID_HOME ~/.buildozer/android/platform/android-sdk
+        
+        # Executa a compilação de forma segura
+        buildozer android debug
