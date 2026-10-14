@@ -21,7 +21,7 @@ jobs:
     - name: Instalar dependencias do sistema e Buildozer
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsqlite3-dev install-info build-essential libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev git ccache HeaderDoc openjdk-17-jdk
+        sudo apt-get install -y libsqlite3-dev install-info build-essential libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev git ccache openjdk-17-jdk
         pip install --upgrade pip
         pip install "cython<3.0.0" buildozer
 
