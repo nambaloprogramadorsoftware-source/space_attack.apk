@@ -1,0 +1,41 @@
+name: Compilar APK Android 2026
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Obter codigo do repositorio
+      uses: actions/checkout@v4
+
+    - name: Configurar ambiente Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Instalar dependencias do sistema e Buildozer
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsqlite3-dev install-info build-essential libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev git ccache HeaderDoc openjdk-17-jdk
+        pip install --upgrade pip
+        pip install "cython<3.0.0" buildozer
+
+    - name: Configurar SDK/NDK Android
+      uses: android-actions/setup-android@v4
+
+    - name: Compilar APK com Buildozer
+      run: |
+        buildozer android debug
+      env:
+        ACCEPT_BUILD_TOOLS_LICENSES: 'y'
+
+    - name: Disponibilizar ficheiro APK para Download
+      uses: actions/upload-artifact@v4
+      with:
+        name: EbenesisGamer-APK
+        path: bin/*.apk
