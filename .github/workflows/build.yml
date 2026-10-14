@@ -28,15 +28,14 @@ jobs:
     - name: Configurar SDK/NDK Android
       uses: android-actions/setup-android@v4
 
-    - name: Aceitar Licenças do Android Automaticamente
+    - name: Compilar APK aceitando licenças automaticamente
       run: |
-        mkdir -p ~/.android
-        touch ~/.android/repositories.cfg
-        yes | sdkmanager --licenses || true
-
-    - name: Compilar APK com Buildozer
-      run: |
-        buildozer android debug
+        # Este comando cria as pastas e aceita as licenças onde o Buildozer vai procurar
+        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+        echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb7437c3550b3118bca0\n24333f1a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        
+        # Executa a compilação enviando "y" (sim) para qualquer pergunta que surgir no terminal
+        yes | buildozer android debug
       env:
         ACCEPT_BUILD_TOOLS_LICENSES: 'y'
 
