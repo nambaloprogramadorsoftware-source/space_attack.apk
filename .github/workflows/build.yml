@@ -28,6 +28,12 @@ jobs:
     - name: Configurar SDK/NDK Android
       uses: android-actions/setup-android@v4
 
+    - name: Aceitar Licenças do Android Automaticamente
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | sdkmanager --licenses || true
+
     - name: Compilar APK com Buildozer
       run: |
         buildozer android debug
