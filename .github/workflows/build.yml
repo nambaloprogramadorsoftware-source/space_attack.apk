@@ -7,17 +7,44 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Versão recomendada para compatibilidade com esta ação
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Obter codigo do repositorio
       uses: actions/checkout@v4
 
-    - name: Compilar APK com Buildozer Action
-      uses: ArtemSBulgakov/buildozer-action@v1
+    - name: Configurar ambiente Python
+      uses: actions/setup-python@v5
       with:
-        command: buildozer android debug
-        repository_root: .
+        python-version: '3.10'
+
+    - name: Instalar dependencias do sistema e Buildozer
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsqlite3-dev install-info build-essential libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev git ccache openjdk-17-jdk
+        pip install --upgrade pip
+        pip install "cython<3.0.0" buildozer
+
+    - name: Configurar SDK/NDK Android Oficial
+      uses: android-actions/setup-android@v3
+
+    - name: Compilar APK com Buildozer
+      run: |
+        # Aceita as licenças do SDK oficial que o GitHub já traz instalado
+        yes | sdkmanager --licenses || true
+        
+        # Cria a pasta secreta do Buildozer e coloca lá dentro o SDK oficial pronto a usar
+        # Isto evita que ele tente descarregar a versão antiga com o link quebrado da Google!
+        mkdir -p ~/.buildozer/android/platform
+        ln -s $ANDROID_HOME ~/.buildozer/android/platform/android-sdk
+        
+        # Altera as permissões para o Buildozer poder ler e escrever tudo
+        chmod -R 755 ~/.buildozer/android/platform/android-sdk
+        
+        # Executa a compilação final forçando a resposta SIM automática
+        yes | buildozer android debug
+      env:
+        ACCEPT_BUILD_TOOLS_LICENSES: 'y'
 
     - name: Disponibilizar ficheiro APK para Download
       uses: actions/upload-artifact@v4
