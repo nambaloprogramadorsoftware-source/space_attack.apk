@@ -7,14 +7,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Usando Ubuntu 22.04 para máxima compatibilidade com a ação do Buildozer
+    runs-on: ubuntu-22.04 # Versão recomendada para compatibilidade com esta ação
 
     steps:
     - name: Obter codigo do repositorio
       uses: actions/checkout@v4
 
     - name: Compilar APK com Buildozer Action
-      uses: ArtemGovorov/buildozer-action@v1
+      uses: ArtemSBulgakov/buildozer-action@v1
       with:
         command: buildozer android debug
         repository_root: .
