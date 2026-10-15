@@ -18,10 +18,16 @@ jobs:
       with:
         python-version: '3.10'
 
+    - name: Configurar Java 17 (Obrigatório)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
     - name: Instalar dependencias do sistema e Buildozer
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsqlite3-dev install-info build-essential libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev git ccache openjdk-17-jdk
+        sudo apt-get install -y libsqlite3-dev install-info build-essential libffi-dev libssl-dev autoconf libtool pkg-config zlib1g-dev git ccache
         pip install --upgrade pip
         pip install "cython<3.0.0" buildozer
 
@@ -30,18 +36,15 @@ jobs:
 
     - name: Compilar APK com Buildozer
       run: |
-        # Aceita as licenças do SDK oficial que o GitHub já traz instalado
+        # Aceita as licenças usando o Java correto
         yes | sdkmanager --licenses || true
         
-        # Cria a pasta secreta do Buildozer e coloca lá dentro o SDK oficial pronto a usar
-        # Isto evita que ele tente descarregar a versão antiga com o link quebrado da Google!
+        # Cria a estrutura de pastas do Buildozer usando o SDK configurado
         mkdir -p ~/.buildozer/android/platform
         ln -s $ANDROID_HOME ~/.buildozer/android/platform/android-sdk
-        
-        # Altera as permissões para o Buildozer poder ler e escrever tudo
         chmod -R 755 ~/.buildozer/android/platform/android-sdk
         
-        # Executa a compilação final forçando a resposta SIM automática
+        # Inicia a compilação enviando respostas automáticas
         yes | buildozer android debug
       env:
         ACCEPT_BUILD_TOOLS_LICENSES: 'y'
