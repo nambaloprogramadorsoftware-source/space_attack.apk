@@ -31,20 +31,16 @@ jobs:
         pip install --upgrade pip
         pip install "cython<3.0.0" buildozer
 
-    - name: Configurar SDK/NDK Android Oficial
-      uses: android-actions/setup-android@v3
-
     - name: Compilar APK com Buildozer
       run: |
-        # Aceita as licenças usando o Java correto
-        yes | sdkmanager --licenses || true
+        # Aceita as licenças do SDK que já vem nativo no GitHub
+        yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
         
-        # Cria a estrutura de pastas do Buildozer usando o SDK configurado
+        # Conecta o Buildozer diretamente ao SDK nativo do servidor
         mkdir -p ~/.buildozer/android/platform
         ln -s $ANDROID_HOME ~/.buildozer/android/platform/android-sdk
-        chmod -R 755 ~/.buildozer/android/platform/android-sdk
         
-        # Inicia a compilação enviando respostas automáticas
+        # Inicia a compilação do APK
         yes | buildozer android debug
       env:
         ACCEPT_BUILD_TOOLS_LICENSES: 'y'
